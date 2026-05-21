@@ -1,4 +1,6 @@
-const API_URL = 'http://localhost:3001/api';
+const API_URL = (location.hostname === 'localhost' || location.hostname === '127.0.0.1')
+    ? 'http://localhost:3001/api'
+    : '/api';
 let authToken = localStorage.getItem('token');
 let currentUsername = localStorage.getItem('username');
 const defaultAvatar = 'https://ui-avatars.com/api/?name=User&background=fff&color=FA8072';
