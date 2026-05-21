@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "name": "wisetodolist-frontend",
+  "builds": [
+    { "src": "frontend/**", "use": "@vercel/static" }
+  ],
+  "routes": [
+    { "src": "/api/(.*)", "dest": "https://wisetodolist-app-1.onrender.com/api/$1" },
+    { "src": "/(.*)", "dest": "/frontend/$1" }
+  ]
+}
