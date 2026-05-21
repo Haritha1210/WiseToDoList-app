@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Premium To-Do Dashboard</title>
+    <meta name="description" content="Responsive To-Do Dashboard with habits, deadlines, important days, and profile management.">
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Sunshine+Market&family=Playfair+Display:wght@700&family=Bebas+Neue&family=Lobster&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+</head>
+<body>
+    <div id="app">
+        <!-- Auth View -->
+        <div id="auth-view" class="view active">
+            <div class="auth-container">
+                <div class="auth-box">
+                    <h2 id="auth-title">Welcome Back</h2>
+                    <p id="auth-subtitle">Please log in to your account.</p>
+                    
+                    <form id="auth-form">
+                        <div class="input-group" id="username-group" style="display: none;">
+                            <label>Username</label>
+                            <input type="text" id="auth-username" placeholder="Enter username">
+                        </div>
+                        <div class="input-group">
+                            <label>Email ID</label>
+                            <input type="email" id="auth-email" placeholder="Enter email" required>
+                        </div>
+                        <div class="input-group">
+                            <label>Strong Password</label>
+                            <input type="password" id="auth-password" placeholder="Enter password" required>
+                        </div>
+                        <button type="submit" class="btn-primary" id="auth-submit-btn">Sign In</button>
+                    </form>
+                    
+                    <p class="auth-toggle">
+                        <span id="auth-toggle-text">Don't have an account?</span> 
+                        <a href="#" id="auth-toggle-link">Sign Up</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main App View -->
+        <div id="main-view" class="view">
+            <!-- Sidebar -->
+            <nav class="sidebar">
+                <div class="profile-section">
+                    <h2 class="sidebar-brand">WiseToDo</h2>
+                    <img src="" alt="Avatar" id="user-avatar" style="object-fit: cover;">
+                    <div class="profile-info">
+                        <h3 id="sidebar-username">User Name</h3>
+                        <p id="sidebar-email">user@email.com</p>
+                    </div>
+                </div>
+
+                <ul class="nav-links">
+                    <li><a href="#" class="nav-link active" data-target="dashboard"><i class="fa-solid fa-border-all"></i> Dashboard</a></li>
+                    <li><a href="#" class="nav-link" data-target="mytasks"><i class="fa-solid fa-check-square"></i> My Task</a></li>
+                    <li><a href="#" class="nav-link" data-target="remember"><i class="fa-solid fa-bell"></i> Remember Task</a></li>
+                    <li><a href="#" class="nav-link" data-target="important"><i class="fa-solid fa-calendar-star"></i> Important Days</a></li>
+                    <li><a href="#" class="nav-link" data-target="todo"><i class="fa-solid fa-list-check"></i> TODO List</a></li>
+                    <li style="margin-top: 2rem;"><a href="#" class="nav-link" data-target="profile"><i class="fa-solid fa-user"></i> Profile</a></li>
+                </ul>
+
+                <button id="logout-btn" class="nav-link logout"><i class="fa-solid fa-sign-out-alt"></i> Logout</button>
+            </nav>
+
+            <!-- Main Content Area -->
+            <main class="content">
+                <header class="topbar">
+                    <div class="search-bar">
+                        <i class="fa-solid fa-search"></i>
+                        <input type="text" placeholder="Search your task here...">
+                    </div>
+                    <div class="topbar-actions">
+                        <div class="date-display" id="current-date">Tuesday, 20/06/2023</div>
+                    </div>
+                </header>
+
+                <div class="pages-container">
+                    <!-- Dashboard Page -->
+                    <div id="page-dashboard" class="page active">
+                        <div class="page-intro">
+                            <img src="images/dashboard_intro_1779357881029.png" alt="Dashboard Illustration">
+                            <div class="intro-text">
+                                <h1 class="page-title">Welcome back, <span id="welcome-name">User</span> 👋</h1>
+                                <p>This is your main dashboard. View your overall progress and quickly manage your active tasks and AI recommended habits.</p>
+                            </div>
+                        </div>
+                        <!-- Sticky Wall -->
+                        <div class="sticky-wall-section">
+                            <div class="sticky-wall-header">
+                                <div>
+                                    <h3>Sticky Wall</h3>
+                                    <p>Live motivational notes that refresh on each visit.</p>
+                                </div>
+                                <div class="sticky-wall-actions">
+                                    <button class="refresh-btn" onclick="renderStickyWall()" title="Refresh quotes"><i class="fa-solid fa-arrows-rotate"></i></button>
+                                    <button class="add-btn" onclick="openStickyNoteModal()">+ Add Note</button>
+                                </div>
+                            </div>
+                            <div id="sticky-wall" class="sticky-wall"></div>
+                        </div>
+                        
+                        <div class="dashboard-grid">
+                            <div class="widget tasks-widget">
+                                <div class="widget-header">
+                                    <h3><i class="fa-regular fa-clipboard"></i> To-Do</h3>
+                                    <button class="add-btn" onclick="openModal('dashboardTask')">+ Add task</button>
+                                </div>
+                                <ul class="task-list checkbox-list" id="dashboard-task-list"></ul>
+                            </div>
+
+                            <div class="right-widgets">
+                                <div class="widget status-widget">
+                                    <h3><i class="fa-solid fa-chart-pie"></i> Task Status</h3>
+                                    <div class="charts-container">
+                                        <div class="chart-wrapper"><canvas id="chart-completed"></canvas><p>Completed</p></div>
+                                        <div class="chart-wrapper"><canvas id="chart-progress"></canvas><p>In Progress</p></div>
+                                        <div class="chart-wrapper"><canvas id="chart-notstarted"></canvas><p>Not Started</p></div>
+                                    </div>
+                                </div>
+
+                                <div class="widget ai-widget">
+                                    <h3><i class="fa-solid fa-sparkles"></i> AI Recommendations</h3>
+                                    <p class="ai-subtitle">Habits suggested based on your activity</p>
+                                    <ul id="ai-habits-list" class="habit-list"></ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- My Tasks (Habits) Page -->
+                    <div id="page-mytasks" class="page">
+                        <div class="page-intro">
+                            <img src="images/habits_intro_1779357915752.png" alt="Habits Illustration">
+                            <div class="intro-text">
+                                <h1 class="page-title">My Daily Habits</h1>
+                                <p>Track your daily life habits here. Check them off every day to maintain your streak!</p>
+                            </div>
+                        </div>
+                        <div class="page-header">
+                            <button class="add-btn" onclick="openModal('habit')">+ Add Habit</button>
+                        </div>
+                        <div class="task-status-summary" id="habit-status-summary">
+                            <div class="status-card">
+                                <h4 id="habit-notstarted-count">0</h4>
+                                <p>Not Started</p>
+                            </div>
+                            <div class="status-card">
+                                <h4 id="habit-inprogress-count">0</h4>
+                                <p>In Progress</p>
+                            </div>
+                            <div class="status-card">
+                                <h4 id="habit-completed-count">0</h4>
+                                <p>Completed</p>
+                            </div>
+                        </div>
+                        <div class="habits-grid" id="my-habits-list"></div>
+                    </div>
+
+                    <!-- Remember Tasks Page -->
+                    <div id="page-remember" class="page">
+                        <div class="page-intro">
+                            <img src="images/remember_intro_1779357944290.png" alt="Remember Tasks Illustration">
+                            <div class="intro-text">
+                                <h1 class="page-title">Remember Tasks</h1>
+                                <p>Tasks with specific deadlines. Make sure you complete them before the due date.</p>
+                            </div>
+                        </div>
+                        <div class="page-header">
+                            <button class="add-btn" onclick="openModal('rememberTask')">+ Add Deadline</button>
+                        </div>
+                        <ul class="task-list checkbox-list" id="remember-task-list"></ul>
+                    </div>
+
+                    <!-- Important Days Page -->
+                    <div id="page-important" class="page">
+                        <div class="page-intro">
+                            <img src="images/important_intro_1779358073111.png" alt="Important Days Illustration">
+                            <div class="intro-text">
+                                <h1 class="page-title">Important Days</h1>
+                                <p>Keep track of birthdays, anniversaries, and other significant events.</p>
+                            </div>
+                        </div>
+                        <div class="page-header">
+                            <button class="add-btn" onclick="openModal('importantDay')">+ Add Date</button>
+                        </div>
+                        <div class="calendar-container">
+                            <div class="calendar-header">
+                                <button class="calendar-nav" onclick="changeImportantMonth(-1)"><i class="fa-solid fa-chevron-left"></i></button>
+                                <div>
+                                    <h3 id="calendar-month-name"></h3>
+                                    <p>Click a date to pin an important day.</p>
+                                </div>
+                                <button class="calendar-nav" onclick="changeImportantMonth(1)"><i class="fa-solid fa-chevron-right"></i></button>
+                            </div>
+                            <div class="calendar-grid" id="important-calendar"></div>
+                            <div class="important-day-list">
+                                <h4>Pinned Dates</h4>
+                                <div id="important-days-list"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Todo List (Max 10) Page -->
+                    <div id="page-todo" class="page">
+                        <div class="page-intro">
+                            <img src="images/todo_intro_1779358086089.png" alt="Todo List Illustration">
+                            <div class="intro-text">
+                                <h1 class="page-title">Strict Todo List</h1>
+                                <p>A focused list limited to 10 high-priority tasks. Generate a printable PDF when you're done planning.</p>
+                            </div>
+                        </div>
+                        <div class="page-header">
+                            <div class="actions">
+                                <button class="add-btn" onclick="openModal('todoList')">+ Add Task</button>
+                                <button class="btn-export" onclick="exportPDF()"><i class="fa-solid fa-file-pdf"></i> Export PDF</button>
+                            </div>
+                        </div>
+                        <div id="pdf-content" class="pdf-container">
+                            <h2>My Todo Checklist</h2>
+                            <ul class="task-list checkbox-list" id="todo-list-items"></ul>
+                        </div>
+                    </div>
+                    
+                    <!-- Profile Page -->
+                    <div id="page-profile" class="page">
+                        <div class="page-intro">
+                            <img src="images/profile_intro_1779358099999.png" alt="Profile Illustration">
+                            <div class="intro-text">
+                                <h1 class="page-title">My Profile</h1>
+                                <p>View your performance statistics and manage your account details.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="profile-container widget">
+                            <div class="profile-header">
+                                <div class="avatar-upload">
+                                    <img src="" alt="Profile Photo" id="profile-page-avatar" style="object-fit: cover;">
+                                    <label for="avatar-input" class="upload-btn"><i class="fa-solid fa-camera"></i> Change Photo</label>
+                                    <input type="file" id="avatar-input" accept="image/*" style="display: none;">
+                                </div>
+                                <div class="profile-stats">
+                                    <div class="stat-box">
+                                        <h3 id="stat-streak">0</h3>
+                                        <p>Total Habit Streaks</p>
+                                    </div>
+                                    <div class="stat-box">
+                                        <h3 id="stat-performance">0%</h3>
+                                        <p>Overall Task Performance</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <form id="profile-form">
+                                <div class="input-group">
+                                    <label>Display Name</label>
+                                    <input type="text" id="profile-name" required>
+                                </div>
+                                <div class="input-group">
+                                    <label>Email Address</label>
+                                    <input type="email" id="profile-email" required>
+                                </div>
+                                <button type="submit" class="btn-primary">Save Changes</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Reusable Modal -->
+    <div id="global-modal" class="modal">
+        <div class="modal-content">
+            <h2 id="modal-title">Add Item</h2>
+            <form id="global-form">
+                <input type="hidden" id="modal-type">
+                
+                <div class="input-group">
+                    <label>Title</label>
+                    <input type="text" id="modal-input-title" required>
+                </div>
+                
+                <div class="input-group" id="modal-group-date" style="display: none;">
+                    <label>Date / Deadline</label>
+                    <input type="date" id="modal-input-date">
+                </div>
+                
+                <div class="modal-actions">
+                    <button type="button" class="btn-secondary" onclick="closeModal()">Cancel</button>
+                    <button type="submit" class="btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
