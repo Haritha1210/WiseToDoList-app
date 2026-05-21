@@ -38,12 +38,43 @@ Since the frontend is built using standard HTML, CSS, and JS, you can simply ope
 - Go into the `frontend` folder.
 - Double-click `index.html` to open it in Chrome, Edge, or your preferred browser.
 
-## Deployment Links (Placeholder)
+## Deployment
 
-- **Frontend:** [Link to Netlify / Vercel]
-- **Backend:** [Link to Render / Heroku]
+### Backend (Render)
+- **Status:** ✅ Deployed  
+- **URL:** https://wisetodolist-app-1.onrender.com
+- Deployed using Node.js on Render with `backend/server.js` as entry point.
 
-*(To fulfill the deployment requirement, you can drag and drop the `frontend` folder into Netlify. For the backend, you can deploy the `backend` folder to a service like Render as a Node.js Web Service.)*
+### Frontend (Vercel)
+
+#### Step 1: Connect Repository to Vercel
+1. Go to [https://vercel.com](https://vercel.com) and sign in (create account if needed).
+2. Click **"Add New..." → "Project"**.
+3. Select **"Import Git Repository"**.
+4. Paste this repo URL: `https://github.com/Haritha1210/WiseToDoList-app.git`
+5. Click **"Import"**.
+
+#### Step 2: Configure Build Settings
+1. Under **"Root Directory"**, select `frontend` from the dropdown (or leave blank if auto-detected).
+2. **Build Command:** Leave as default or set to `npm install` (no build needed for vanilla frontend).
+3. **Output Directory:** Leave as default or set to `frontend` (Vercel will serve static files).
+4. Click **"Deploy"**.
+
+#### Step 3: Verify Deployment
+- Vercel will auto-deploy from the `main` branch.
+- Your frontend URL will be displayed (e.g., `https://wise-to-do-list-app-xxxx.vercel.app/`).
+- The `vercel.json` file automatically routes `/api/*` calls to the Render backend.
+
+#### Step 4: Test the App
+- Open your Vercel deployment URL in a browser.
+- Sign up / Log in to verify API communication with the Render backend.
+- If you see "Server error. Ensure backend is running," the Render backend may be spinning up (can take 30–60 seconds on first request).
+
+### How It Works
+- **Frontend** (Vercel): Serves the static HTML/CSS/JS from the `frontend/` directory.
+- **Backend** (Render): Express API running at `https://wisetodolist-app-1.onrender.com`.
+- **API Routing** (`vercel.json`): Automatically rewrites `/api/*` requests to the Render backend.
+- **Environment-Aware URL**: The frontend uses `/api` in production and `http://localhost:3001/api` in local dev.
 
 ## Code Overview
 
