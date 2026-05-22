@@ -80,6 +80,7 @@ const authView = document.getElementById('auth-view');
 const mainView = document.getElementById('main-view');
 const authForm = document.getElementById('auth-form');
 const authToggleLink = document.getElementById('auth-toggle-link');
+const authErrorEl = document.getElementById('auth-error');
 const usernameGroup = document.getElementById('username-group');
 const sidebarUsername = document.getElementById('sidebar-username');
 const sidebarEmail = document.getElementById('sidebar-email');
@@ -110,6 +111,7 @@ document.addEventListener('DOMContentLoaded', () => {
 // --- AUTHENTICATION ---
 authToggleLink.addEventListener('click', (e) => {
     e.preventDefault();
+    clearAuthError();
     isLoginMode = !isLoginMode;
     document.getElementById('auth-title').textContent = isLoginMode ? 'Welcome Back' : 'Create Account';
     document.getElementById('auth-subtitle').textContent = isLoginMode ? 'Please log in to your account.' : 'Sign up to get started.';
@@ -121,6 +123,8 @@ authToggleLink.addEventListener('click', (e) => {
 
 authForm.addEventListener('submit', async (e) => {
     e.preventDefault();
+    clearAuthError();
+
     const email = document.getElementById('auth-email').value;
     const password = document.getElementById('auth-password').value;
     const username = document.getElementById('auth-username').value;
@@ -143,12 +147,22 @@ authForm.addEventListener('submit', async (e) => {
             localStorage.setItem('username', currentUsername);
             showMainApp();
         } else {
-            alert(data.error);
+            showAuthError(data.error || 'Unable to authenticate. Please try again.');
         }
     } catch (err) {
-        alert('Server error. Ensure backend is running.');
+        showAuthError('Server error. Backend may still be starting or unreachable. Please wait a moment and refresh.');
     }
 });
+
+function showAuthError(message) {
+    authErrorEl.textContent = message;
+    authErrorEl.classList.add('active');
+}
+
+function clearAuthError() {
+    authErrorEl.textContent = '';
+    authErrorEl.classList.remove('active');
+}
 
 document.getElementById('logout-btn').addEventListener('click', () => {
     localStorage.removeItem('token');
