@@ -98,6 +98,40 @@ body {
     transition: border-color 0.2s;
 }
 
+.password-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.password-wrapper input {
+    flex: 1;
+    padding-right: 3rem;
+}
+
+.password-toggle-btn {
+    position: absolute;
+    right: 0.75rem;
+    border: none;
+    background: transparent;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 0.5rem;
+    font-size: 1.1rem;
+    transition: color 0.2s;
+}
+
+.password-toggle-btn:hover {
+    color: var(--accent);
+}
+
+.password-requirement {
+    display: block;
+    margin-top: 0.5rem;
+    font-size: 0.82rem;
+    color: var(--text-faint);
+}
+
 .input-group input:focus, .input-group select:focus {
     border-color: var(--accent);
 }

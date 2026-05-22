@@ -109,26 +109,42 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // --- AUTHENTICATION ---
-authToggleLink.addEventListener('click', (e) => {
-    e.preventDefault();
-    clearAuthError();
-    isLoginMode = !isLoginMode;
+function setAuthMode(loginMode) {
+    isLoginMode = loginMode;
     document.getElementById('auth-title').textContent = isLoginMode ? 'Welcome Back' : 'Create Account';
     document.getElementById('auth-subtitle').textContent = isLoginMode ? 'Please log in to your account.' : 'Sign up to get started.';
     document.getElementById('auth-submit-btn').textContent = isLoginMode ? 'Sign In' : 'Sign Up';
     document.getElementById('auth-toggle-text').textContent = isLoginMode ? "Don't have an account?" : "Already have an account?";
     authToggleLink.textContent = isLoginMode ? 'Sign Up' : 'Sign In';
     usernameGroup.style.display = isLoginMode ? 'none' : 'block';
+}
+
+authToggleLink.addEventListener('click', (e) => {
+    e.preventDefault();
+    clearAuthError();
+    setAuthMode(!isLoginMode);
 });
+
+function isStrongPassword(password) {
+    const hasUppercase = /[A-Z]/.test(password);
+    const hasLowercase = /[a-z]/.test(password);
+    const hasNumber = /\d/.test(password);
+    const isLongEnough = password.length >= 8;
+    return hasUppercase && hasLowercase && hasNumber && isLongEnough;
+}
 
 authForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     clearAuthError();
 
-    const email = document.getElementById('auth-email').value;
+    const email = document.getElementById('auth-email').value.trim();
     const password = document.getElementById('auth-password').value;
-    const username = document.getElementById('auth-username').value;
+    const username = document.getElementById('auth-username').value.trim();
     
+    if (!isLoginMode && !isStrongPassword(password)) {
+        return showAuthError('Password must be at least 8 characters and include uppercase, lowercase, and a number.');
+    }
+
     const endpoint = isLoginMode ? '/login' : '/register';
     const payload = isLoginMode ? { email, password } : { username, email, password };
     
@@ -141,11 +157,18 @@ authForm.addEventListener('submit', async (e) => {
         
         const data = await res.json();
         if (res.ok) {
-            authToken = data.token;
-            currentUsername = data.username;
-            localStorage.setItem('token', authToken);
-            localStorage.setItem('username', currentUsername);
-            showMainApp();
+            if (isLoginMode) {
+                authToken = data.token;
+                currentUsername = data.username;
+                localStorage.setItem('token', authToken);
+                localStorage.setItem('username', currentUsername);
+                showMainApp();
+            } else {
+                showAuthError('Account created successfully! Please sign in with your credentials.');
+                setAuthMode(true);
+                authForm.reset();
+                document.getElementById('auth-email').value = '';
+            }
         } else {
             showAuthError(data.error || 'Unable to authenticate. Please try again.');
         }
@@ -162,6 +185,18 @@ function showAuthError(message) {
 function clearAuthError() {
     authErrorEl.textContent = '';
     authErrorEl.classList.remove('active');
+}
+
+const passwordInput = document.getElementById('auth-password');
+const passwordToggleBtn = document.getElementById('password-toggle-btn');
+
+if (passwordToggleBtn) {
+    passwordToggleBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const isPassword = passwordInput.type === 'password';
+        passwordInput.type = isPassword ? 'text' : 'password';
+        passwordToggleBtn.innerHTML = isPassword ? '<i class="fa-regular fa-eye"></i>' : '<i class="fa-regular fa-eye-slash"></i>';
+    });
 }
 
 document.getElementById('logout-btn').addEventListener('click', () => {

@@ -32,7 +32,12 @@
                         </div>
                         <div class="input-group">
                             <label>Strong Password</label>
-                            <input type="password" id="auth-password" placeholder="Enter password" required>
+                            <div class="password-wrapper">
+                                <input type="password" id="auth-password" placeholder="Enter password" required>
+                                <button type="button" id="password-toggle-btn" class="password-toggle-btn" aria-label="Toggle password visibility">
+                                    <i class="fa-regular fa-eye-slash"></i>
+                                </button>
+                            </div>
                         </div>
                         <button type="submit" class="btn-primary" id="auth-submit-btn">Sign In</button>
                     </form>
